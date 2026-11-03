@@ -29,22 +29,29 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Setup Java (Requerido para compilación móvil/web de Flutter)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.5" # Versión compatible estable
+          flutter-version: "3.24.5"
           channel: "stable"
           cache: true
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install flet
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Build Web with Base URL
-        # Se envía "yes" por tubería (pipe) para responder afirmativamente a cualquier confirmación interactiva
-        run: yes | flet build web --base-url /${{ github.event.repository.name }}/
+        run: flet build web --base-url /${{ github.event.repository.name }}/
+        env:
+          FLET_NON_INTERACTIVE: "true"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
